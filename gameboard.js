@@ -1,6 +1,13 @@
 const Gameboard = function() {
-    let board = [];
-    let numberedBoard = [];
+    function init() {
+        this.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    }
+    function update(player, coords) {
+        this.board[coords[0]][coords[1]] = player.getToken();
+    }
+    function clear() {
+
+    }
 }();
 
 const GameController = function() {
