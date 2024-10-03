@@ -1,7 +1,3 @@
-pubsub.subscribe
-pubsub.unsubscribe
-pubsub.publish
-
 const pubsub = {
     events: {},
     subscribe: function(eventName, fn) {
