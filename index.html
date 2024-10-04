@@ -4,14 +4,39 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="pubsub.js"></script>
+        <script src="pubsub.js" defer></script>
         <script src="gameboard.js" defer></script>
         <link rel="stylesheet" href="style.css">
         <title>Tic Tac Toe</title>
     </head>
 
     <body>
-
+        <div class="wrapper">
+            <h1>Tic Tac Toe</h1>
+            <div class="scoreboard"></div>
+            <div class="start-game-section">
+                <button>New Game</button>
+                <div class="options">
+                    Game Mode
+                    <ul>
+                        <li>2 Players</li>
+                        <li>Computer</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="gameboard">
+                <div class="cell">x</div>
+                <div class="cell">x</div>
+                <div class="cell">x</div>
+                <div class="cell">o</div>
+                <div class="cell">x</div>
+                <div class="cell">o</div>
+                <div class="cell">o</div>
+                <div class="cell">x</div>
+                <div class="cell">x</div>
+            </div>
+        </div>
+        </div>
     </body>
 
 </html>
