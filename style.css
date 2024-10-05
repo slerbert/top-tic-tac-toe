@@ -137,7 +137,7 @@ body {
 
 .gameboard {
     aspect-ratio: 1 / 1;
-    width: 65%;
+    height: 65%;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
