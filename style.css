@@ -98,9 +98,10 @@ textarea:not([rows]) {
     --fs2: calc(var(--fs1) * var(--fs-ratio));
     --fs3: calc(var(--fs2) * var(--fs-ratio));
 
+    --title-ff: "Sixtyfour Convergence", sans-serif;
+
 
     /* Colors */
-
     --clr-purple-500: hsla(275, 100%, 11%, 1);
     --clr-purple-200: hsla(282, 66%, 28%, 1);
     --clr-purple-100: hsla(281, 36%, 54%, 1);
@@ -127,12 +128,20 @@ body {
     background-color: var(--clr-purple-400);
 }
 
+h1 {
+  text-align: center;
+  font-size: var(--fs2);
+  font-family: var(--title-ff);
+  color: blue;
+}
+
 .wrapper {
     background-color: var(--clr-purple-500);
     height: calc(100% - var(--s0));
     width: 60%;
     margin: 0 auto;
     padding: var(--s0) var(--s2);
+    border-radius: 2%;
 }
 
 .gameboard {
@@ -162,4 +171,28 @@ body {
 .circle {
   height: 90%;
   width: 90%;
+}
+
+.ribbon {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  display: none;
+}
+
+.ribbon {
+  --s: 1.5em; /* the ribbon size */
+  --d: .5em;  /* the depth */
+  --c: .8em;  /* the cutout part */
+  
+  padding: 0 calc(var(--s) + .5em) var(--d);
+  line-height: 1.8;
+  background:
+    conic-gradient(at left  var(--s) bottom var(--d),
+     #0000 25%,#0008 0 37.5%,#0004 0) 0   /50% 100% no-repeat,
+    conic-gradient(at right var(--s) bottom var(--d),
+     #0004 62.5%,#0008 0 75%,#0000 0) 100%/50% 100% no-repeat;
+    clip-path: polygon(0 var(--d), var(--s) var(--d),var(--s) 0,calc(100% - var(--s)) 0,calc(100% - var(--s)) var(--d),100% var(--d),calc(100% - var(--c)) calc(50% + var(--d)/2),100% 100%,calc(100% - var(--s) - var(--d)) 100%,calc(100% - var(--s) - var(--d)) calc(100% - var(--d)),calc(var(--s) + var(--d)) calc(100% - var(--d)),calc(var(--s) + var(--d)) 100%,0 100%,var(--c) calc(50% + var(--d)/2));
+  background-color: var(--clr-green); /* the main color */
+  width: fit-content;
 }

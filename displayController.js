@@ -3,13 +3,24 @@ const DisplayController = function(board) {
     let cells = [];
     const gameboardQuery = document.querySelector(".gameboard");
     const newGameBtnQuery = document.querySelector("#newGameButton");
+    const winnerRibbonQuery = document.querySelector(".ribbon");
 
-    pubsub.subscribe("boardInit", buildGameboardNodes);
-    pubsub.subscribe("boardInit", toggleGameboardListener);
+    pubsub.subscribe("boardInit", onBoardInit);
+    pubsub.subscribe("boardInit", toggleWinnerRibbon)
     pubsub.subscribe("playerMove", renderMove);
     pubsub.subscribe("boardClear", clearBoard);
-    pubsub.subscribe("gameEnd", toggleGameboardListener);
+    pubsub.subscribe("gameEnd", onGameEnd);
     
+    function onBoardInit(boardState) {
+        buildGameboardNodes(boardState);
+        toggleGameboardListener();
+    }
+
+    function onGameEnd(winnerName) {
+        toggleGameboardListener();
+        toggleWinnerRibbon(winnerName);
+    }
+
     newGameBtnQuery.addEventListener("click", e => {
         pubsub.publish("newGame");
     });
@@ -34,7 +45,7 @@ const DisplayController = function(board) {
         }
     }
     
-    function buildGameboardNodes (boardState) {
+    function buildGameboardNodes(boardState) {
         boardData = boardState;
         const size = boardState.length;
         for (let i = 0; i < size; i++) {
@@ -66,4 +77,19 @@ const DisplayController = function(board) {
     function clearBoard() {
         gameboardQuery.replaceChildren();
     }
+
+    function toggleWinnerRibbon(name) {
+        const isActive = winnerRibbonQuery.getAttribute("data-active");
+
+        if (!isActive || isActive === "true") {
+            winnerRibbonQuery.textContent = "";
+            winnerRibbonQuery.style.display = "none";
+            winnerRibbonQuery.setAttribute("data-active", false); 
+        }
+        else {
+            winnerRibbonQuery.textContent = `Game over. ${name} wins!`;
+            winnerRibbonQuery.style.display = "block";
+            winnerRibbonQuery.setAttribute("data-active", true);            
+        }
+     }
 }();

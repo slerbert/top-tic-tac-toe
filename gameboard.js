@@ -35,8 +35,8 @@ const Gameboard = function(boardSize = 3) {
         // If player's token == -1, they'll win if any return -3
         const winCondition = player.getToken() * 3;
         
-        const colSum = getTokenSum(col);
-        const rowSum = getTokenSum(row);
+        const colSum = getTokenSum(col, "column");
+        const rowSum = getTokenSum(row, "row");
         const primaryDiagSum = getTokenSum([row, col], primaryDiagonal);
         const secondaryDiagSum = getTokenSum([row, col], secondaryDiagonal);
         
@@ -47,19 +47,20 @@ const Gameboard = function(boardSize = 3) {
         return array.some(a => subarray.every((v, i) => v === a[i]));
     }
 
-    function getTokenSum(index, diagonal = null) {
-        if (typeof index === "object" && diagonal) {
+    function getTokenSum(index, axis = null) {
+        if (typeof index === "object") {
             let diagonalSum = 0;
-            if (containsSubArray(diagonal, index)) {
-                diagonalSum = diagonal.reduce(
+            if (containsSubArray(axis, index)) {
+                diagonalSum = axis.reduce(
                     (prev, current) => prev + boardData[current[0]][current[1]], 0
                 );
             }
             return diagonalSum;
-        } 
-
-        // Row or col token sum 
-        return boardData[index].reduce((a, b) => a + b, 0);
+        } else if (axis === "column") {
+            return boardData.reduce((a, b) => a + b[index], 0);
+        } else {
+            return boardData[index].reduce((a, b) => a + b, 0);
+        }
     }
 
     function getBoard() {
@@ -100,8 +101,8 @@ const GameController = function() {
         activePlayer = player1;
     };
 
-    const endGame = function() {
-        pubsub.publish("gameEnd");
+    const endGame = function(name) {
+        pubsub.publish("gameEnd", name);
     }
 
     const playRound = function([row, col]) {       
@@ -117,7 +118,7 @@ const GameController = function() {
     
                 if (hasWon) {
                     console.log(`${activePlayer.getName()} wins!`);
-                    endGame();
+                    endGame(activePlayer.getName());
                 }
             }
     
