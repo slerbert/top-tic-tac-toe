@@ -153,3 +153,13 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+.cross {
+  height: 75%;
+  width: 75%;
+}
+
+.circle {
+  height: 90%;
+  width: 90%;
+}

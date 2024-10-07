@@ -3,25 +3,38 @@ const DisplayController = function(board) {
     let cells = [];
     const gameboardQuery = document.querySelector(".gameboard");
     const newGameBtnQuery = document.querySelector("#newGameButton");
-    
-    pubsub.subscribe("boardInit", buildCellNodes);
+
+    pubsub.subscribe("boardInit", buildGameboardNodes);
+    pubsub.subscribe("boardInit", toggleGameboardListener);
     pubsub.subscribe("playerMove", renderMove);
     pubsub.subscribe("boardClear", clearBoard);
+    pubsub.subscribe("gameEnd", toggleGameboardListener);
+    
+    newGameBtnQuery.addEventListener("click", e => {
+        pubsub.publish("newGame");
+    });
+    
+    function toggleGameboardListener() {
+        const isActive = gameboardQuery.getAttribute("data-active");
 
-    // Event listener for Gameboard cells
-    gameboardQuery.addEventListener("click", e => {
+        if (!isActive || isActive === "false") {
+            gameboardQuery.addEventListener("click", handleCellClick);
+            gameboardQuery.setAttribute("data-active", true);            
+        } else {
+            gameboardQuery.removeEventListener("click", handleCellClick);
+            gameboardQuery.setAttribute("data-active", false);
+        }
+    }
+
+    function handleCellClick(e) {
         const row = e.target.getAttribute("data-row");
         const col = e.target.getAttribute("data-col");
         if (row) {
             pubsub.publish("cellClick", [parseInt(row), parseInt(col)]);
         }
-    });
-
-    newGameBtnQuery.addEventListener("click", e => {
-        pubsub.publish("newGame");
-    });
+    }
     
-    function buildCellNodes(boardState) {
+    function buildGameboardNodes (boardState) {
         boardData = boardState;
         const size = boardState.length;
         for (let i = 0; i < size; i++) {
@@ -38,7 +51,16 @@ const DisplayController = function(board) {
     }
 
     function renderMove({ token, row, col }) {
-        cells[row][col].textContent = token;
+        const playerToken = new Image();
+        
+        if (token === 1) {
+            playerToken.src = "circle.svg";
+            playerToken.classList.add("circle")
+        } else {
+            playerToken.src = "cross.svg";
+            playerToken.classList.add("cross")
+        }
+        cells[row][col].appendChild(playerToken);
     }
 
     function clearBoard() {

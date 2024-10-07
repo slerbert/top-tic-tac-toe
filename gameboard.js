@@ -70,10 +70,6 @@ const Gameboard = function(boardSize = 3) {
         return boardSize;
     }
 
-    function render() {
-        console.table(boardData);
-    }
-
     function setBoardSize(size) {
         if (size > 1 && size <= 9) {
             boardSize = size;
@@ -83,7 +79,6 @@ const Gameboard = function(boardSize = 3) {
     function update(player, [row, col]) {
         const token = player.getToken();
         boardData[row][col] = token;
-        render();
         pubsub.publish("playerMove", { token, row, col });
     }
 
@@ -96,7 +91,6 @@ const Gameboard = function(boardSize = 3) {
 
 const GameController = function() {
     let player1, player2, activePlayer;
-    let isPlayable = false; // will be used to control event listeners
 
     const playGame = function() {
         isPlayable = true;
@@ -105,6 +99,10 @@ const GameController = function() {
         player2 = createPlayer("Player B", !randomToken);
         activePlayer = player1;
     };
+
+    const endGame = function() {
+        pubsub.publish("gameEnd");
+    }
 
     const playRound = function([row, col]) {       
         let playerMove = [row, col];
@@ -135,9 +133,6 @@ const GameController = function() {
     return { playGame, playRound };
     
     // helper functions
-    function endGame() {
-        isPlayable = false;
-    }
 
     function switchActivePlayer() {
         activePlayer = activePlayer === player1 ? player2 : player1;
