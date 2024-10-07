@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 /* Box sizing rules */
 *,
@@ -108,6 +109,8 @@ textarea:not([rows]) {
     --clr-yellow: hsla(49, 70%, 55%, 1);
     --clr-blue-200: hsla(198, 92%, 71%, 1);
     --clr-blue-100: hsla(212, 74%, 86%, 1);
+    --clr-pink-200: hsla(317, 66%, 65%, 1);
+    --clr-pink-100: hsla(317, 67%, 80%, 1);
     --clr-green: hsla(121, 41%, 35%, 1);
     --clr-purple-400: hsla(276, 74%, 20%, 1);
     --clr-purple-300: hsla(277, 61%, 28%, 1);
@@ -126,13 +129,15 @@ body {
     padding: var(--s0);
     color: #fff;
     background-color: var(--clr-purple-400);
+    font-family: Poppins, sans-serif;
 }
 
 h1 {
   text-align: center;
   font-size: var(--fs2);
   font-family: var(--title-ff);
-  color: blue;
+  margin-top: var(--s0);
+  margin-bottom: var(--s2); 
 }
 
 .wrapper {
@@ -152,6 +157,36 @@ h1 {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 1.5rem;
+}
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  text-align: center;
+  margin: 0 20%;
+  gap: 2rem;
+  font-size: var(--fs1);
+  font-weight: 600;
+}
+
+.scoreboard > * {
+  border-radius: 1rem;
+  padding: var(--s-1);
+}
+
+.scoreboard p {
+  font-size: calc(var(--fs1) + 1rem);
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, .2);
+}
+
+#player-o {
+  background-color: var(--clr-blue-200);
+  border: 3px solid rgba(0, 0, 255, .3);
+}
+
+#player-x {
+  background: var(--clr-pink-100);
+  border: 3px solid var(--clr-pink-200);
 }
 
 .cell {
@@ -195,4 +230,14 @@ h1 {
     clip-path: polygon(0 var(--d), var(--s) var(--d),var(--s) 0,calc(100% - var(--s)) 0,calc(100% - var(--s)) var(--d),100% var(--d),calc(100% - var(--c)) calc(50% + var(--d)/2),100% 100%,calc(100% - var(--s) - var(--d)) 100%,calc(100% - var(--s) - var(--d)) calc(100% - var(--d)),calc(var(--s) + var(--d)) calc(100% - var(--d)),calc(var(--s) + var(--d)) 100%,0 100%,var(--c) calc(50% + var(--d)/2));
   background-color: var(--clr-green); /* the main color */
   width: fit-content;
+}
+
+.ribbon a {
+  font-weight: 600;
+  text-decoration: none;
+  cursor:pointer;
+}
+
+.ribbon a:hover {
+  color: var(--clr-purple-300);
 }

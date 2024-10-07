@@ -91,18 +91,24 @@ const Gameboard = function(boardSize = 3) {
 }();
 
 const GameController = function() {
-    let player1, player2, activePlayer;
+    let activePlayer, player1, player2;
+
+    const resetToInitialState = function() {
+        // Called on page load and on reset by user
+        const randomToken = Math.random() >= 0.5;
+        player1 = createPlayer(randomToken);
+        player2 = createPlayer(!randomToken);
+        playGame();
+    };
 
     const playGame = function() {
-        isPlayable = true;
-        const randomToken = Math.random() >= 0.5;
-        player1 = createPlayer("Player A", randomToken);
-        player2 = createPlayer("Player B", !randomToken);
+        player1.resetMoveCount();
+        player2.resetMoveCount()
         activePlayer = player1;
     };
 
-    const endGame = function(name) {
-        pubsub.publish("gameEnd", name);
+    const endGame = function(name, score) {
+        pubsub.publish("gameEnd", { name, score });
     }
 
     const playRound = function([row, col]) {       
@@ -118,7 +124,8 @@ const GameController = function() {
     
                 if (hasWon) {
                     console.log(`${activePlayer.getName()} wins!`);
-                    endGame(activePlayer.getName());
+                    activePlayer.incrementScore();
+                    endGame(activePlayer.getName(), activePlayer.getScore());
                 }
             }
     
@@ -128,8 +135,9 @@ const GameController = function() {
 
     pubsub.subscribe("cellClick", playRound);
     pubsub.subscribe("newGame", playGame);
+    pubsub.subscribe("resetGame", resetToInitialState);
 
-    playGame();
+    resetToInitialState();
 
     return { playGame, playRound };
     
@@ -140,14 +148,20 @@ const GameController = function() {
     }
 }();
 
-function createPlayer (name, token) {
+function createPlayer (token) {
     let playerMoveCount = 0;
     const playerToken = (token === true ? 1 : -1);
-    
-    const getName = () => name;
+    let playerScore = 0;
+
+    const playerName = playerToken === 1 ? "Player O" : "Player X";
+
+    const getName = () => playerName;
+    const getScore = () => playerScore;
     const getToken = () => playerToken;
     const getMoveCount = () => playerMoveCount;
     const incrementMoveCount = () => playerMoveCount++;
+    const incrementScore = () => playerScore++;
+    const resetMoveCount = () => (playerMoveCount = 0);
 
-    return { getName, getToken, incrementMoveCount, getMoveCount };
+    return { getName, getToken, incrementMoveCount, getMoveCount, getScore, incrementScore, resetMoveCount };
 }

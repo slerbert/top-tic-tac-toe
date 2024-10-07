@@ -2,8 +2,14 @@ const DisplayController = function(board) {
     let boardData;
     let cells = [];
     const gameboardQuery = document.querySelector(".gameboard");
-    const newGameBtnQuery = document.querySelector("#newGameButton");
+    const resetBtnQuery = document.querySelector("#resetButton");
     const winnerRibbonQuery = document.querySelector(".ribbon");
+    const scoreboardPlayerO = document.querySelector("#player-o > p");
+    const scoreboardPlayerX = document.querySelector("#player-x > p");
+    const scoreboardDraws = document.querySelector("#draws > p");
+    const playAgainPrompt = document.createElement("a");
+    playAgainPrompt.id = "playAgain";
+    playAgainPrompt.textContent = "Play again?";
 
     pubsub.subscribe("boardInit", onBoardInit);
     pubsub.subscribe("boardInit", toggleWinnerRibbon)
@@ -16,14 +22,24 @@ const DisplayController = function(board) {
         toggleGameboardListener();
     }
 
-    function onGameEnd(winnerName) {
+    function onGameEnd({ name, score} ) {
         toggleGameboardListener();
-        toggleWinnerRibbon(winnerName);
+        toggleWinnerRibbon(name);
+        updateScoreboard(name, score);
     }
 
-    newGameBtnQuery.addEventListener("click", e => {
-        pubsub.publish("newGame");
+    resetBtnQuery.addEventListener("click", e => {
+        pubsub.publish("resetGame");
     });
+    
+    function updateScoreboard(name, score) {
+        console.log(score)
+        if (name === "Player O") {
+            scoreboardPlayerO.textContent = score;
+        } else if (name === "Player X") {
+            scoreboardPlayerX.textContent = score;
+        }
+    }
     
     function toggleGameboardListener() {
         const isActive = gameboardQuery.getAttribute("data-active");
@@ -83,13 +99,23 @@ const DisplayController = function(board) {
 
         if (!isActive || isActive === "true") {
             winnerRibbonQuery.textContent = "";
+
+            // Remove all event listeners
+            playAgainPrompt.replaceWith(playAgainPrompt.cloneNode(true));
+
             winnerRibbonQuery.style.display = "none";
             winnerRibbonQuery.setAttribute("data-active", false); 
         }
         else {
-            winnerRibbonQuery.textContent = `Game over. ${name} wins!`;
+            winnerRibbonQuery.textContent = `Game over. ${name} wins! `;
+            winnerRibbonQuery.appendChild(playAgainPrompt);
+
+            playAgainPrompt.addEventListener("click", () => {
+                pubsub.publish("newGame");
+            }, { once: true });
+
             winnerRibbonQuery.style.display = "block";
-            winnerRibbonQuery.setAttribute("data-active", true);            
+            winnerRibbonQuery.setAttribute("data-active", true);    
         }
      }
 }();
