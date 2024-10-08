@@ -89,10 +89,10 @@ const DisplayController = function(board) {
         const playerToken = new Image();
         
         if (token === 1) {
-            playerToken.src = "circle.svg";
+            playerToken.src = "./assets/circle.svg";
             playerToken.classList.add("circle")
         } else {
-            playerToken.src = "cross.svg";
+            playerToken.src = "./assets/cross.svg";
             playerToken.classList.add("cross")
         }
         cells[row][col].appendChild(playerToken);
@@ -117,7 +117,7 @@ const DisplayController = function(board) {
             pubsub.publish("newGame");
         }, { once: true });
 
-        winnerRibbonQuery.style.display = "block";
+        winnerRibbonQuery.style.visibility = "visible";
         winnerRibbonQuery.setAttribute("data-active", true);    
      }
 
@@ -127,7 +127,7 @@ const DisplayController = function(board) {
         // Remove all event listeners
         playAgainPrompt.replaceWith(playAgainPrompt.cloneNode(true));
 
-        winnerRibbonQuery.style.display = "none";
+        winnerRibbonQuery.style.visibility = "hidden";
         winnerRibbonQuery.setAttribute("data-active", false); 
      }
 }();
