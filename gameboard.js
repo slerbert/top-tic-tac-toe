@@ -7,8 +7,10 @@ const Gameboard = function(boardSize = 3) {
 
     pubsub.subscribe("newGame", clear);
     pubsub.subscribe("newGame", init);
+    pubsub.subscribe("resetGame", clear);
+    pubsub.subscribe("resetGame", init);
     
-    function init(boardSize = 3) {        
+    function init(boardize = 3) {        
         // Initialize board and record diagonal indices
         for (let i = 0; i < boardSize; i++) {
             boardData[i] = [];

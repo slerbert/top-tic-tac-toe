@@ -12,7 +12,6 @@ const DisplayController = function(board) {
     playAgainPrompt.textContent = "Play again?";
 
     pubsub.subscribe("boardInit", onBoardInit);
-    pubsub.subscribe("boardInit", toggleWinnerRibbon)
     pubsub.subscribe("playerMove", renderMove);
     pubsub.subscribe("boardClear", clearBoard);
     pubsub.subscribe("gameEnd", onGameEnd);
@@ -20,9 +19,10 @@ const DisplayController = function(board) {
     function onBoardInit(boardState) {
         buildGameboardNodes(boardState);
         toggleGameboardListener();
+        toggleWinnerRibbon();
     }
 
-    function onGameEnd({ name, score} ) {
+    function onGameEnd({ name, score } ) {
         toggleGameboardListener();
         toggleWinnerRibbon(name);
         updateScoreboard(name, score);
@@ -30,15 +30,21 @@ const DisplayController = function(board) {
 
     resetBtnQuery.addEventListener("click", e => {
         pubsub.publish("resetGame");
+        resetScoreboard();
     });
     
     function updateScoreboard(name, score) {
-        console.log(score)
         if (name === "Player O") {
             scoreboardPlayerO.textContent = score;
         } else if (name === "Player X") {
             scoreboardPlayerX.textContent = score;
         }
+    }
+
+    function resetScoreboard() {
+        scoreboardPlayerO.textContent = 0;
+        scoreboardPlayerX.textContent = 0;
+        scoreboardDraws.textContent = 0;
     }
     
     function toggleGameboardListener() {
@@ -98,24 +104,32 @@ const DisplayController = function(board) {
         const isActive = winnerRibbonQuery.getAttribute("data-active");
 
         if (!isActive || isActive === "true") {
-            winnerRibbonQuery.textContent = "";
-
-            // Remove all event listeners
-            playAgainPrompt.replaceWith(playAgainPrompt.cloneNode(true));
-
-            winnerRibbonQuery.style.display = "none";
-            winnerRibbonQuery.setAttribute("data-active", false); 
+            hideWinnerRibbon();
         }
-        else {
-            winnerRibbonQuery.textContent = `Game over. ${name} wins! `;
-            winnerRibbonQuery.appendChild(playAgainPrompt);
-
-            playAgainPrompt.addEventListener("click", () => {
-                pubsub.publish("newGame");
-            }, { once: true });
-
-            winnerRibbonQuery.style.display = "block";
-            winnerRibbonQuery.setAttribute("data-active", true);    
+        else if (isActive === "false") {
+            showWinnerRibbon(name);
         }
+     }
+
+     function showWinnerRibbon(name) {
+        winnerRibbonQuery.textContent = `Game over. ${name} wins! `;
+        winnerRibbonQuery.appendChild(playAgainPrompt);
+
+        playAgainPrompt.addEventListener("click", () => {
+            pubsub.publish("newGame");
+        }, { once: true });
+
+        winnerRibbonQuery.style.display = "block";
+        winnerRibbonQuery.setAttribute("data-active", true);    
+     }
+
+     function hideWinnerRibbon() {
+        winnerRibbonQuery.textContent = "";
+
+        // Remove all event listeners
+        playAgainPrompt.replaceWith(playAgainPrompt.cloneNode(true));
+
+        winnerRibbonQuery.style.display = "none";
+        winnerRibbonQuery.setAttribute("data-active", false); 
      }
 }();
