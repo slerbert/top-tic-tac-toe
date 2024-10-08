@@ -3,8 +3,6 @@ const Gameboard = function(boardSize = 3) {
     let primaryDiagonal = [];
     let secondaryDiagonal = [];
 
-    init();
-
     pubsub.subscribe("gameStart", onGameStart);
     pubsub.subscribe("newGame", onGameStart);
     pubsub.subscribe("resetGame", onGameStart);
@@ -99,83 +97,3 @@ const Gameboard = function(boardSize = 3) {
     
     return { init, clear, evaluateWin, evaluateDraw, getBoard, getBoardSize, update, validateMove };
 }();
-
-const GameController = function() {
-    let activePlayer, player1, player2;
-    let nDraws = 0;
-
-    const resetToInitialState = function() {
-        const randomToken = Math.random() >= 0.5;
-        player1 = createPlayer(randomToken);
-        player2 = createPlayer(!randomToken);
-
-        pubsub.publish("gameStart");
-
-        playGame();
-    };
-
-    const playGame = function() {
-        player1.resetMoveCount();
-        player2.resetMoveCount()
-        activePlayer = player1;
-    };
-
-    const endGame = function(condition, name, score) {
-        pubsub.publish("gameEnd", { condition, name, score });
-    }
-
-    const playRound = function([row, col]) {       
-        let playerMove = [row, col];
-        let isValidMove = Gameboard.validateMove(playerMove);
-
-        if (isValidMove) {
-            Gameboard.update(activePlayer, playerMove);
-            activePlayer.incrementMoveCount();
-            
-            if (activePlayer.getMoveCount() >= Gameboard.getBoardSize()) {
-                let hasWon = Gameboard.evaluateWin(activePlayer, playerMove);
-                let drawnGame = Gameboard.evaluateDraw();
-    
-                if (hasWon) {
-                    activePlayer.incrementScore();
-                    endGame("win", activePlayer.getName(), activePlayer.getScore());
-                } else if(drawnGame) {
-                    nDraws++;
-                    endGame("draw", null, nDraws);
-                }
-
-            }
-            switchActivePlayer();
-        }
-    };
-
-    pubsub.subscribe("cellClick", playRound);
-    pubsub.subscribe("newGame", playGame);
-    pubsub.subscribe("resetGame", resetToInitialState);
-
-    resetToInitialState();
-
-    return { playGame, playRound };
-
-    function switchActivePlayer() {
-        activePlayer = activePlayer === player1 ? player2 : player1;
-    }
-}();
-
-function createPlayer (token) {
-    let playerMoveCount = 0;
-    const playerToken = (token === true ? 1 : -1);
-    let playerScore = 0;
-
-    const playerName = playerToken === 1 ? "Player O" : "Player X";
-
-    const getName = () => playerName;
-    const getScore = () => playerScore;
-    const getToken = () => playerToken;
-    const getMoveCount = () => playerMoveCount;
-    const incrementMoveCount = () => playerMoveCount++;
-    const incrementScore = () => playerScore++;
-    const resetMoveCount = () => (playerMoveCount = 0);
-
-    return { getName, getToken, incrementMoveCount, getMoveCount, getScore, incrementScore, resetMoveCount };
-}

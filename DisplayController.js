@@ -23,7 +23,6 @@ const DisplayController = function(board) {
     }
 
     function onGameEnd({ condition, name, score } ) {
-        console.log(score)
         removeGameboardListener();
         updateScoreboard(condition, name, score);
         showWinnerRibbon(condition, name);
