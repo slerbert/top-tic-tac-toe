@@ -18,14 +18,15 @@ const DisplayController = function(board) {
     
     function onBoardInit(boardState) {
         buildGameboardNodes(boardState);
-        toggleGameboardListener();
-        toggleWinnerRibbon();
+        addGameboardListener();
+        hideWinnerRibbon();
     }
 
-    function onGameEnd({ name, score } ) {
-        toggleGameboardListener();
-        toggleWinnerRibbon(name);
-        updateScoreboard(name, score);
+    function onGameEnd({ condition, name, score } ) {
+        console.log(score)
+        removeGameboardListener();
+        updateScoreboard(condition, name, score);
+        showWinnerRibbon(condition, name);
     }
 
     resetBtnQuery.addEventListener("click", e => {
@@ -33,11 +34,15 @@ const DisplayController = function(board) {
         resetScoreboard();
     });
     
-    function updateScoreboard(name, score) {
-        if (name === "Player O") {
-            scoreboardPlayerO.textContent = score;
-        } else if (name === "Player X") {
-            scoreboardPlayerX.textContent = score;
+    function updateScoreboard(condition, name, score) {
+        if (condition === "draw") {
+            scoreboardDraws.textContent = score;
+        } else {
+            if (name === "Player O") {
+                scoreboardPlayerO.textContent = score;
+            } else if (name === "Player X") {
+                scoreboardPlayerX.textContent = score;
+            }
         }
     }
 
@@ -46,17 +51,15 @@ const DisplayController = function(board) {
         scoreboardPlayerX.textContent = 0;
         scoreboardDraws.textContent = 0;
     }
-    
-    function toggleGameboardListener() {
-        const isActive = gameboardQuery.getAttribute("data-active");
 
-        if (!isActive || isActive === "false") {
-            gameboardQuery.addEventListener("click", handleCellClick);
-            gameboardQuery.setAttribute("data-active", true);            
-        } else {
-            gameboardQuery.removeEventListener("click", handleCellClick);
-            gameboardQuery.setAttribute("data-active", false);
-        }
+    function addGameboardListener() {
+        gameboardQuery.addEventListener("click", handleCellClick);
+        gameboardQuery.setAttribute("data-active", true);            
+    }
+
+    function removeGameboardListener() {
+        gameboardQuery.removeEventListener("click", handleCellClick);
+        gameboardQuery.setAttribute("data-active", false);
     }
 
     function handleCellClick(e) {
@@ -100,19 +103,15 @@ const DisplayController = function(board) {
         gameboardQuery.replaceChildren();
     }
 
-    function toggleWinnerRibbon(name) {
-        const isActive = winnerRibbonQuery.getAttribute("data-active");
-
-        if (!isActive || isActive === "true") {
-            hideWinnerRibbon();
+     function showWinnerRibbon(condition, name) {
+        let ribbonText = "Game over. ";
+        if (condition === "win")
+        {
+            ribbonText += `${name} wins! `;
+        } else {
+            ribbonText += `It's a draw! `
         }
-        else if (isActive === "false") {
-            showWinnerRibbon(name);
-        }
-     }
-
-     function showWinnerRibbon(name) {
-        winnerRibbonQuery.textContent = `Game over. ${name} wins! `;
+        winnerRibbonQuery.textContent = ribbonText;
         winnerRibbonQuery.appendChild(playAgainPrompt);
 
         playAgainPrompt.addEventListener("click", () => {

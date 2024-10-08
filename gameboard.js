@@ -3,14 +3,13 @@ const Gameboard = function(boardSize = 3) {
     let primaryDiagonal = [];
     let secondaryDiagonal = [];
 
-    init(boardSize);
+    init();
 
-    pubsub.subscribe("newGame", clear);
-    pubsub.subscribe("newGame", init);
-    pubsub.subscribe("resetGame", clear);
-    pubsub.subscribe("resetGame", init);
+    pubsub.subscribe("gameStart", onGameStart);
+    pubsub.subscribe("newGame", onGameStart);
+    pubsub.subscribe("resetGame", onGameStart);
     
-    function init(boardize = 3) {        
+    function init(boardSize = 3) {        
         // Initialize board and record diagonal indices
         for (let i = 0; i < boardSize; i++) {
             boardData[i] = [];
@@ -22,6 +21,11 @@ const Gameboard = function(boardSize = 3) {
             }
         }
         pubsub.publish("boardInit", boardData);
+    }
+
+    function onGameStart() {
+        clear();
+        init();
     }
 
     function clear() {
@@ -65,6 +69,10 @@ const Gameboard = function(boardSize = 3) {
         }
     }
 
+    function evaluateDraw() {
+        return !boardData.some(a => a.includes(0));
+    }
+
     function getBoard() {
         return boardData;
     }
@@ -89,17 +97,20 @@ const Gameboard = function(boardSize = 3) {
         return boardData[row][col] === 0;
     }
     
-    return { init, clear, evaluateWin, getBoard, getBoardSize, update, validateMove };
+    return { init, clear, evaluateWin, evaluateDraw, getBoard, getBoardSize, update, validateMove };
 }();
 
 const GameController = function() {
     let activePlayer, player1, player2;
+    let nDraws = 0;
 
     const resetToInitialState = function() {
-        // Called on page load and on reset by user
         const randomToken = Math.random() >= 0.5;
         player1 = createPlayer(randomToken);
         player2 = createPlayer(!randomToken);
+
+        pubsub.publish("gameStart");
+
         playGame();
     };
 
@@ -109,8 +120,8 @@ const GameController = function() {
         activePlayer = player1;
     };
 
-    const endGame = function(name, score) {
-        pubsub.publish("gameEnd", { name, score });
+    const endGame = function(condition, name, score) {
+        pubsub.publish("gameEnd", { condition, name, score });
     }
 
     const playRound = function([row, col]) {       
@@ -123,14 +134,17 @@ const GameController = function() {
             
             if (activePlayer.getMoveCount() >= Gameboard.getBoardSize()) {
                 let hasWon = Gameboard.evaluateWin(activePlayer, playerMove);
+                let drawnGame = Gameboard.evaluateDraw();
     
                 if (hasWon) {
-                    console.log(`${activePlayer.getName()} wins!`);
                     activePlayer.incrementScore();
-                    endGame(activePlayer.getName(), activePlayer.getScore());
+                    endGame("win", activePlayer.getName(), activePlayer.getScore());
+                } else if(drawnGame) {
+                    nDraws++;
+                    endGame("draw", null, nDraws);
                 }
+
             }
-    
             switchActivePlayer();
         }
     };
@@ -142,8 +156,6 @@ const GameController = function() {
     resetToInitialState();
 
     return { playGame, playRound };
-    
-    // helper functions
 
     function switchActivePlayer() {
         activePlayer = activePlayer === player1 ? player2 : player1;
