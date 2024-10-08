@@ -259,9 +259,25 @@ h1 {
 .ribbon a {
   font-weight: 600;
   text-decoration: none;
-  cursor:pointer;
+  font-style: italic;
+  background: linear-gradient(90deg,
+  #fff,
+    var(--clr-blue-200),
+    #fff,
+    var(--clr-pink-200),
+    #fff) 0 0 / 400% 100%;
+  color: transparent;
+  background-clip: text;
+  cursor: pointer;
+  animation: playAgain 8s linear infinite;
 }
 
 .ribbon a:hover {
   color: var(--clr-purple-300);
+}
+
+@keyframes playAgain {
+  to {
+    background-position: 400% 0;
+  }
 }
